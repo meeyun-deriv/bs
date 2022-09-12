@@ -16,20 +16,22 @@ Clear Input Field
     Repeat Keyword    ${value_length}    Press Keys    ${input_field}   BACKSPACE
     Repeat Keyword    1   Press Keys    ${input_field}   DELETE
 
-Select market
-    [arguments]     ${market}   ${underlying}
-    Wait until page does not contain element    //*[@class="chart-container__loader"]     60    # wait until chart finish loading
-    Wait until page does not contain element    //*[contains(@class,"initial-loader")]     60    # wait until chart finish loading
-    Wait until page contains element    //*[@class="cq-symbol-select-btn"]     40    # wait until market selection menu appears
-    Click element   //*[@class="cq-symbol-select-btn"]
+Select Market
+    [arguments]    ${market}    ${underlying}
+    Wait until page does not contain Element    //*[@class="chart-container__loader"]    60    # wait until chart finish loading
+    Wait until page does not contain Element    //*[contains(@class,"initial-loader")]    60    # wait until chart finish loading
+    Wait until page contains Element    //*[@class="cq-symbol-select-btn"]    40    # wait until market selection menu appears
+    Click Element    //*[@class="cq-symbol-select-btn"]
+    Sleep    5s
     # wait until market dropdown expanded
-    Wait until page contains element    //*[@class="sc-dialog cq-menu-dropdown cq-menu-dropdown-enter-done"]     5
-    Wait until page contains element    ${market}     5    # wait until market appears in menu
-    Click element   ${market}
-    Wait until page contains element    //*[@class="ic-icon ic-1HZ10V"]     5    # wait R_10_1s underlying
-    Click element   ${underlying}
+    Wait Until Page Contains Element    ${market}    10    # wait until market appears in menu
+    Click Element    ${market}
+    Sleep    5s
+    Wait Until Page Contains Element    ${underlying}    10    # wait R_10_1s underlying
+    Click Element    ${underlying}
+    Sleep    5s
     # wait until market dropdown collapsed
-    Wait until page does not contain element    //*[@class="sc-dialog cq-menu-dropdown cq-menu-dropdown-enter-done"]     5
+    Wait Until Page Does Not Contain Element    //*[@class="sc-dialog cq-menu-dropdown cq-menu-dropdown-enter-done"]    5
 
 Select contract type and contract parameters
     [arguments]     ${contract_type}
@@ -45,17 +47,17 @@ Click buy button
     Click element   ${button}
 
 *** Test Cases ***
-Loginok
-    Login
+# Loginok
+#     Login
 
-Buy rise contract
-    Login
-    Select market   //*[@class="ic-icon ic-synthetic_index"]   //*[@class="ic-icon ic-1HZ10V"]
-    Select contract type and contract parameters    dt_contract_rise_fall_item
-    Click buy button    dt_purchase_put_button
-    [Teardown]  Close browser
+# Buy rise contract
+#     Login
+#     Select market   //*[@class="ic-icon ic-synthetic_index"]   //*[@class="ic-icon ic-1HZ10V"]
+#     Select contract type and contract parameters    dt_contract_rise_fall_item
+#     Click buy button    dt_purchase_put_button
+#     [Teardown]  Close browser
 
-Buy lower contract
+# Buy lower contract
     # use payout and custom payout amount
     Login
     Select market   //*[@class="ic-icon ic-forex"]      //*[@class="sc-mcd__item sc-mcd__item--frxAUDUSD "]
@@ -67,15 +69,15 @@ Buy lower contract
     Click buy button    dt_purchase_put_button
     [Teardown]  Close browser
 
-Check relative barrier error
+# Check relative barrier error
     Login
-    Select market   //*[@class="ic-icon ic-forex"]      //*[@class="sc-mcd__item sc-mcd__item--frxAUDUSD "]
+    Select Market   //*[@class="ic-icon ic-forex"]      //span[@class="ic-frx ic-frxAUDUSD"]
     Select contract type and contract parameters    dt_contract_high_low_item
     Clear Input Field   //*[@name="duration"]
-    Input text   //*[@name="duration"]     2
+    Input text   //*[@name="duration"]     3
     Clear Input Field   dt_barrier_1_input
     Input text   dt_barrier_1_input     +1.00
-    Wait until page contains
+    Wait until page contains    Contracts more than 24 hours in duration would need an absolute barrier.    10
     [Teardown]  Close browser
 
 Check multiplier contract parameter
@@ -83,7 +85,7 @@ Check multiplier contract parameter
     #---------------------
     # only stake, no payout
     #---------------------
-    Select market   //*[@class="ic-icon ic-synthetic_index"]   //*[@class="sc-mcd__item sc-mcd__item--R_50 "]
+    Select Market    //*[@class="ic-icon ic-synthetic_index"]    //div[contains(text(),'Volatility 50 Index')]
     Select contract type and contract parameters    dt_contract_multiplier_item
     Page should not contain     Payout
     #---------------------
@@ -142,7 +144,7 @@ Check multiplier contract parameter
     Wait until element is enabled    dt_purchase_multup_button
     ${stake_value_after_plus}=     Get element attribute   dt_amount_input     value
     ${expected_stake_after_added}=    Evaluate    ${current_stake_value}+1
-    ${expected_stake_after_added}=    Evaluate      "%.2f" % ${expected_stake_after_added}
+    ${expected_stake_after_added}=    Evaluate      "%.2f" % ${expected_stake_after_added}    #We have a defect in Prod. If this 76134 card is not ready then use "%.1f"
     Should be equal     ${expected_stake_after_added}    ${stake_value_after_plus}
     #---------------------
     # - button in take profit field should be decremental of 1 USD
